@@ -30,3 +30,35 @@ D:\AI Squad prototype\Temp\bin\Debug\UnityEngine.VR.xml
 D:\AI Squad prototype\obj\Debug\Assembly-CSharp.csprojResolveAssemblyReference.cache
 D:\AI Squad prototype\obj\Debug\Assembly-CSharp.dll
 D:\AI Squad prototype\obj\Debug\Assembly-CSharp.pdb
+D:\AI\obj\Debug\Assembly-CSharp.csprojResolveAssemblyReference.cache
+D:\AI\obj\Debug\Assembly-CSharp.dll
+D:\AI\obj\Debug\Assembly-CSharp.pdb
+D:\AI\Temp\bin\Debug\Assembly-CSharp.dll
+D:\AI\Temp\bin\Debug\Assembly-CSharp.pdb
+D:\AI\Temp\bin\Debug\nunit.framework.dll
+D:\AI\Temp\bin\Debug\UnityEditor.dll
+D:\AI\Temp\bin\Debug\UnityEngine.Analytics.dll
+D:\AI\Temp\bin\Debug\UnityEngine.dll
+D:\AI\Temp\bin\Debug\UnityEngine.HoloLens.dll
+D:\AI\Temp\bin\Debug\UnityEngine.Networking.dll
+D:\AI\Temp\bin\Debug\UnityEngine.TestRunner.dll
+D:\AI\Temp\bin\Debug\UnityEngine.UI.dll
+D:\AI\Temp\bin\Debug\UnityEngine.VR.dll
+D:\AI\Temp\bin\Debug\Mono.Cecil.dll
+D:\AI\Temp\bin\Debug\Unity.SerializationLogic.dll
+D:\AI\Temp\bin\Debug\Unity.DataContract.dll
+D:\AI\Temp\bin\Debug\ICSharpCode.NRefactory.dll
+D:\AI\Temp\bin\Debug\Unity.UNetWeaver.dll
+D:\AI\Temp\bin\Debug\Unity.CecilTools.dll
+D:\AI\Temp\bin\Debug\Mono.Cecil.Pdb.dll
+D:\AI\Temp\bin\Debug\Mono.Cecil.Mdb.dll
+D:\AI\Temp\bin\Debug\UnityEngine.xml
+D:\AI\Temp\bin\Debug\UnityEditor.xml
+D:\AI\Temp\bin\Debug\UnityEngine.UI.xml
+D:\AI\Temp\bin\Debug\UnityEngine.Networking.xml
+D:\AI\Temp\bin\Debug\UnityEngine.TestRunner.xml
+D:\AI\Temp\bin\Debug\nunit.framework.xml
+D:\AI\Temp\bin\Debug\UnityEngine.Analytics.xml
+D:\AI\Temp\bin\Debug\UnityEngine.HoloLens.xml
+D:\AI\Temp\bin\Debug\UnityEngine.VR.xml
+D:\AI\Temp\bin\Debug\Assembly-CSharp-firstpass.pdb

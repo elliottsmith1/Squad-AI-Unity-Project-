@@ -30,7 +30,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private Camera m_Camera;
 
-		public GameObject[] allies;
+        public GameObject[] allies;
 
         private bool m_Jump;
         private float m_YRotation;
@@ -59,7 +59,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_AudioSource = GetComponent<AudioSource>();
 			m_MouseLook.Init(transform , m_Camera.transform);
 
-			allies = GameObject.FindGameObjectsWithTag("Ally");
+            allies = GameObject.FindGameObjectsWithTag("Ally");
         }
 
 
@@ -87,34 +87,26 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             m_PreviouslyGrounded = m_CharacterController.isGrounded;
 
-			if (CrossPlatformInputManager.GetButtonDown("Point"))
-			{
-				Debug.Log("X pressed");
+            if (CrossPlatformInputManager.GetButtonDown("Point"))
+            {
+                Debug.Log("X pressed");
 
-				RaycastHit hit;
-				Vector3 fwd = transform.TransformDirection(Vector3.forward);
+                RaycastHit hit;
+                Vector3 fwd = transform.TransformDirection(Vector3.forward);
 
-				if (Physics.Raycast(transform.position, fwd, out hit, 20))
-				{
-					// if (hit.rigidbody != null)
-					{
-						Debug.Log("Object hit");
+                if (Physics.Raycast(transform.position, fwd, out hit, 20))
+                {
+                    // if (hit.rigidbody != null)
+                    {
+                        Debug.Log("Object hit");
 
-						foreach (GameObject ally in allies)
-						{
-							ally.transform.position = hit.point;
-
-							//AllyBehaviour allyScript = ally.GetComponent (typeof(AllyBehaviour));
-							//allyScript.newPosition (hit.point);
-
-							//ally.GetComponent<AllyBehaviour> ().newPosition (hit.point);
-
-							//NavMeshAgent allyAI = ally.GetComponent<NavMeshAgent> ();
-							//allyAI.destination = hit.point;
-						}
-					}
-				}
-			}
+                        foreach (GameObject ally in allies)
+                        {
+                            ally.GetComponent<AllyBehaviour>().newPosition(hit.point);
+                        }
+                    }
+                }
+            }
         }
 
 

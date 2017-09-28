@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class AllyBehaviour : MonoBehaviour {
 
-	private Vector3 targetTransform = new Vector3(0, 2, 0);
+	private Vector3 targetTransform = new Vector3(0, 1.2f, 0);
 	public float speed = 2.0f;
 	private UnityEngine.AI.NavMeshAgent allyAI;
 
@@ -20,13 +20,12 @@ public class AllyBehaviour : MonoBehaviour {
 
 		if (transform.position != targetTransform) 
 		{
-			float step = speed * Time.deltaTime;
-			//transform.position = Vector3.MoveTowards(transform.position, targetTransform, step);
+            allyAI.SetDestination(targetTransform);
 		}
 			
 	}
 
-	void newPosition(Vector3 newPos)
+	public void newPosition(Vector3 newPos)
 	{
 		targetTransform = newPos;
 	}
