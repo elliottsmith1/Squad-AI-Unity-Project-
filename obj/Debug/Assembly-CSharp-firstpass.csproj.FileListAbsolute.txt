@@ -59,3 +59,4 @@ D:\AI\Temp\bin\Debug\nunit.framework.xml
 D:\AI\Temp\bin\Debug\UnityEngine.Analytics.xml
 D:\AI\Temp\bin\Debug\UnityEngine.HoloLens.xml
 D:\AI\Temp\bin\Debug\UnityEngine.VR.xml
+D:\AI\obj\Debug\Assembly-CSharp-firstpass.csprojResolveAssemblyReference.cache

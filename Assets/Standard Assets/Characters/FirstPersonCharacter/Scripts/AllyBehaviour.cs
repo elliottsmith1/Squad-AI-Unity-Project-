@@ -7,9 +7,12 @@ public class AllyBehaviour : MonoBehaviour {
 	private Vector3 targetTransform = new Vector3(0, 1.2f, 0);
 	public float speed = 2.0f;
 	private UnityEngine.AI.NavMeshAgent allyAI;
+    private float maxRange 5;
+    private float minRange 2;
 
-	// Use this for initialization
-	void Start () {
+
+    // Use this for initialization
+    void Start () {
 		targetTransform = transform.position;
 
 		allyAI = GetComponent<UnityEngine.AI.NavMeshAgent> ();  
@@ -18,8 +21,10 @@ public class AllyBehaviour : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-		if (transform.position != targetTransform) 
-		{
+        //if (transform.position != targetTransform) 
+        if ((Vector3.Distance(transform.position, targetTransform) < maxRange)
+            && (Vector3.Distance(transform.position, targetTransform) > minRange))
+        {
             allyAI.SetDestination(targetTransform);
 		}
 			
