@@ -9,9 +9,9 @@ public class pointerMovement : MonoBehaviour {
     private Vector3 targetPos;
 
 	// Use this for initialization
-	void Start () {
-        targetPos = transform.position;
-		
+	void Start ()
+    {
+        targetPos = transform.position;		
 	}
 	
 	// Update is called once per frame
@@ -40,20 +40,7 @@ public class pointerMovement : MonoBehaviour {
 
     void FixedUpdate()
     {
-        //RaycastHit hit;
-
-        //Ray ray = Camera.main.transform.forward(Input.mousePosition);
-
-        //if (Physics.Raycast(ray, hit))
-        //{
-        //    targetPos = hit.transform.position;
-
-        //    targetPos.y = transform.position.y;
-
-        //    transform.position = targetPos;
-        //}
-
-        targetPos = Camera.main.transform.position + Camera.main.transform.forward * 5;
+        targetPos = Camera.main.transform.position + Camera.main.transform.forward * 7;
 
         targetPos.y = transform.position.y;
 

@@ -112,24 +112,19 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 Debug.Log("X pressed");
 
-                RaycastHit hit;
-                Vector3 fwd = transform.TransformDirection(Vector3.forward);
+                //RaycastHit hit;
+                //Vector3 fwd = transform.TransformDirection(Vector3.forward);
 
-                if (Physics.Raycast(transform.position, fwd, out hit, 20))
+                //if (Physics.Raycast(transform.position, fwd, out hit, 20))
+                //{
+                //    pointer.transform.position = hit.transform.position;
+                //}
+
+                foreach (GameObject ally in allies)
                 {
-                    // if (hit.rigidbody != null)
-                    {
-                        Debug.Log("Object hit");
+                    ally.GetComponent<AllyBehaviour>().following = false;
 
-                        //foreach (GameObject ally in allies)
-                        //{
-                        //    ally.GetComponent<AllyBehaviour>().following = false;
-
-                        //    ally.GetComponent<AllyBehaviour>().newPosition(hit.point);
-                        //}
-
-                        pointer.transform.position = hit.transform.position;
-                    }
+                    ally.GetComponent<AllyBehaviour>().newPosition(pointer.transform.position);
                 }
             }
 
