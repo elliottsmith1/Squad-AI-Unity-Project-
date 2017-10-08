@@ -108,6 +108,48 @@ NavMeshSettings:
     tileSize: 256
     accuratePlacement: 0
   m_NavMeshData: {fileID: 23800000, guid: d647c3f4a74036948a8bc19c4abf33b8, type: 2}
+--- !u!1001 &272307944
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4618773148452058, guid: 5b648f2cb41727e43846df763b5bbc70, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0.000000017517
+      objectReference: {fileID: 0}
+    - target: {fileID: 4618773148452058, guid: 5b648f2cb41727e43846df763b5bbc70, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4618773148452058, guid: 5b648f2cb41727e43846df763b5bbc70, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4618773148452058, guid: 5b648f2cb41727e43846df763b5bbc70, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4618773148452058, guid: 5b648f2cb41727e43846df763b5bbc70, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4618773148452058, guid: 5b648f2cb41727e43846df763b5bbc70, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4618773148452058, guid: 5b648f2cb41727e43846df763b5bbc70, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4618773148452058, guid: 5b648f2cb41727e43846df763b5bbc70, type: 2}
+      propertyPath: m_RootOrder
+      value: 10
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: 5b648f2cb41727e43846df763b5bbc70, type: 2}
+  m_IsPrefabParent: 0
 --- !u!1001 &572768190
 Prefab:
   m_ObjectHideFlags: 0
@@ -347,7 +389,7 @@ Rigidbody:
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0.05
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 126
@@ -601,6 +643,10 @@ Prefab:
     - target: {fileID: 400000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 2}
       propertyPath: m_RootOrder
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 2}
+      propertyPath: m_TagString
+      value: Player
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 2}

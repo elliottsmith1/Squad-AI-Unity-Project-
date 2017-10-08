@@ -32,6 +32,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         public GameObject[] allies;
 
+        private GameObject pointer;
+
         private bool m_Jump;
         private float m_YRotation;
         private Vector2 m_Input;
@@ -60,6 +62,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
 			m_MouseLook.Init(transform , m_Camera.transform);
 
             allies = GameObject.FindGameObjectsWithTag("Ally");
+
+            pointer = GameObject.FindGameObjectWithTag("Pointer");
         }
 
 
@@ -87,6 +91,23 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             m_PreviouslyGrounded = m_CharacterController.isGrounded;
 
+            //RaycastHit hit;
+            //Vector3 fwd = transform.TransformDirection(Vector3.forward);
+
+            //if (Physics.Raycast(transform.position, fwd, out hit, 20))
+            //{
+            //    //if (hit.rigidbody != null)
+            //    {
+            //        Debug.Log("hit");
+
+            //        Vector3 newPos = hit.transform.position;
+
+            //        newPos.y = 0.3f;
+
+            //        pointer.transform.position = newPos;
+            //    }
+            //}
+
             if (CrossPlatformInputManager.GetButtonDown("Point"))
             {
                 Debug.Log("X pressed");
@@ -100,10 +121,32 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     {
                         Debug.Log("Object hit");
 
-                        foreach (GameObject ally in allies)
-                        {
-                            ally.GetComponent<AllyBehaviour>().newPosition(hit.point);
-                        }
+                        //foreach (GameObject ally in allies)
+                        //{
+                        //    ally.GetComponent<AllyBehaviour>().following = false;
+
+                        //    ally.GetComponent<AllyBehaviour>().newPosition(hit.point);
+                        //}
+
+                        pointer.transform.position = hit.transform.position;
+                    }
+                }
+            }
+
+            if (Input.GetButtonDown("Follow"))
+            {
+                foreach (GameObject ally in allies)
+                {
+                    if (ally.GetComponent<AllyBehaviour>().following == false)
+                    {
+                        ally.GetComponent<AllyBehaviour>().following = true;
+                    }
+
+                    else
+                    {
+                        ally.GetComponent<AllyBehaviour>().following = false;
+
+                        ally.GetComponent<AllyBehaviour>().stopMoving();
                     }
                 }
             }
