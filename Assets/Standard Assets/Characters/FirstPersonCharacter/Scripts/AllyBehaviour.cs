@@ -2,14 +2,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum AllyState
+{
+    COVER,
+    FOLLOWING,
+    STOPPED,
+    MOVING
+}
+
 public class AllyBehaviour : MonoBehaviour {
 
 	public Vector3 targetTransform = new Vector3(0, 1.0f, 0);
 	public float speed = 2.0f;
 	private UnityEngine.AI.NavMeshAgent allyAI;
-    public float minRange = 5;
-    public bool following = false;
-    private float allyDistance = 0.2f;
+    public float minRange = 1;
+    private float allyDistance = 0.75f;
+    private bool movingToCover = false;
+
+    public Animator anim;
+
+    public AllyState state;
 
     private GameObject player;
     List<GameObject> allies = new List<GameObject>();
@@ -17,6 +29,10 @@ public class AllyBehaviour : MonoBehaviour {
     // Use this for initialization
     void Start ()
     {
+        state = AllyState.STOPPED;
+
+        anim = GetComponent<Animator>();
+
         foreach (GameObject ally in GameObject.FindGameObjectsWithTag("Ally"))
         {
             if (ally != this)
@@ -35,27 +51,37 @@ public class AllyBehaviour : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+        float move = GetComponent<Rigidbody>().velocity.magnitude;
+
+        //Debug.Log(move);
+
+        //anim.SetFloat("Speed", move);
+
         foreach (GameObject ally in allies)
         {
             if (Vector3.Distance(transform.position, ally.transform.position) < allyDistance)
-            {
+            {                
                 transform.position = Vector3.MoveTowards(transform.position, ally.transform.position, -1 * speed * Time.deltaTime);
             }
         }
 
-        if (following)
+        if (state == AllyState.FOLLOWING)
         {
             targetTransform = player.transform.position;
         }
 
         if (Vector3.Distance(transform.position, targetTransform) > minRange)
         {
+            anim.SetFloat("Speed", 1);
             allyAI.SetDestination(targetTransform);
 		}
 
         else
         {
-            stopMoving();
+            if (state != AllyState.COVER)
+            {
+                stopMoving();
+            }
         }		
 	}
 
@@ -66,11 +92,27 @@ public class AllyBehaviour : MonoBehaviour {
 
     public void stopMoving()
     {
+        if (movingToCover == true)
+        {
+            movingToCover = false;
+            state = AllyState.COVER;
+            anim.SetTrigger("CombatIdle");
+        }
+
+        else
+        {
+            state = AllyState.STOPPED;
+        }
+
         targetTransform = transform.position;
+        anim.SetFloat("Speed", 0);
     }
 
     public void FindCover()
     {
+        state = AllyState.MOVING;
+        //anim.SetTrigger(CombatIdle);
+
         GameObject[] covers;
         covers = GameObject.FindGameObjectsWithTag("Cover");
 
@@ -113,6 +155,7 @@ public class AllyBehaviour : MonoBehaviour {
                     {
                         child.GetComponent<CoverPoint>().Occupied = true;
                         newPosition(child.transform.position);
+                        movingToCover = true;
                         return;
                     }
                 }

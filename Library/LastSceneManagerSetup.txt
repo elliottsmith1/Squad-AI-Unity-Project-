@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/scene.unity
+- path: Assets/Mega Fantasy Props Pack/Example Scenes/Castle wireframe.unity
   isLoaded: 1
   isActive: 1
