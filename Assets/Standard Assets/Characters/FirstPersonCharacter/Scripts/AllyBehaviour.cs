@@ -9,7 +9,7 @@ public class AllyBehaviour : MonoBehaviour {
 	private UnityEngine.AI.NavMeshAgent allyAI;
     public float minRange = 5;
     public bool following = false;
-    private float allyDistance = 2.0f;
+    private float allyDistance = 0.2f;
 
     private GameObject player;
     List<GameObject> allies = new List<GameObject>();
@@ -69,5 +69,54 @@ public class AllyBehaviour : MonoBehaviour {
         targetTransform = transform.position;
     }
 
-    
+    public void FindCover()
+    {
+        GameObject[] covers;
+        covers = GameObject.FindGameObjectsWithTag("Cover");
+
+        GameObject closest = null;
+        float closestDis = 1000.0f; ;
+
+        foreach (GameObject cover in covers)
+        {
+            float dis = Vector3.Distance(transform.position, cover.transform.position);
+
+            if (dis < closestDis)
+            {
+                int spots = 3;
+                foreach (Transform child in cover.transform)
+                {
+                    if (child.tag == "CoverPoint")
+                    {
+                        if (child.GetComponent<CoverPoint>().Occupied == true)
+                        {
+                            spots--;
+                        }
+                    }
+                }
+
+                if (spots > 0)
+                {
+                    closestDis = dis;
+                    closest = cover;
+                }
+            }
+        }
+
+        if (closest != null)
+        {
+            foreach (Transform child in closest.transform)
+            {
+                if (child.tag == "CoverPoint")
+                {
+                    if (child.GetComponent<CoverPoint>().Occupied == false)
+                    {
+                        child.GetComponent<CoverPoint>().Occupied = true;
+                        newPosition(child.transform.position);
+                        return;
+                    }
+                }
+            }
+        }
+    }    
 }

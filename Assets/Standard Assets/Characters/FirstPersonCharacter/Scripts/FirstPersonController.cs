@@ -145,6 +145,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     }
                 }
             }
+
+            if (Input.GetButtonDown("Cover"))
+            {
+                foreach (GameObject ally in allies)
+                {
+                    ally.GetComponent<AllyBehaviour>().FindCover();
+                }
+            }
         }
 
 
