@@ -91,40 +91,17 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             m_PreviouslyGrounded = m_CharacterController.isGrounded;
 
-            //RaycastHit hit;
-            //Vector3 fwd = transform.TransformDirection(Vector3.forward);
-
-            //if (Physics.Raycast(transform.position, fwd, out hit, 20))
-            //{
-            //    //if (hit.rigidbody != null)
-            //    {
-            //        Debug.Log("hit");
-
-            //        Vector3 newPos = hit.transform.position;
-
-            //        newPos.y = 0.3f;
-
-            //        pointer.transform.position = newPos;
-            //    }
-            //}
-
             if (CrossPlatformInputManager.GetButtonDown("Point"))
             {
-                Debug.Log("X pressed");
-
-                //RaycastHit hit;
-                //Vector3 fwd = transform.TransformDirection(Vector3.forward);
-
-                //if (Physics.Raycast(transform.position, fwd, out hit, 20))
-                //{
-                //    pointer.transform.position = hit.transform.position;
-                //}
 
                 foreach (GameObject ally in allies)
                 {
-                    ally.GetComponent<AllyBehaviour>().state = AllyState.MOVING;
+                    if (ally.GetComponent<AllyBehaviour>().movingToCover != true)
+                    {
+                        ally.GetComponent<AllyBehaviour>().state = AllyState.MOVING;
 
-                    ally.GetComponent<AllyBehaviour>().newPosition(pointer.transform.position);
+                        ally.GetComponent<AllyBehaviour>().newPosition(pointer.transform.position);
+                    }
                 }
             }
 
@@ -134,7 +111,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 {
                     if (ally.GetComponent<AllyBehaviour>().state != AllyState.FOLLOWING)
                     {
-                        ally.GetComponent<AllyBehaviour>().state = AllyState.FOLLOWING;
+                        if (ally.GetComponent<AllyBehaviour>().movingToCover != true)
+                        {
+                            ally.GetComponent<AllyBehaviour>().state = AllyState.FOLLOWING;
+                        }
                     }
 
                     else

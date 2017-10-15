@@ -13,11 +13,13 @@ public enum AllyState
 public class AllyBehaviour : MonoBehaviour {
 
 	public Vector3 targetTransform = new Vector3(0, 1.0f, 0);
-	public float speed = 2.0f;
+	public float speed = 3.0f;
 	private UnityEngine.AI.NavMeshAgent allyAI;
     public float minRange = 1;
     private float allyDistance = 0.75f;
-    private bool movingToCover = false;
+    public bool movingToCover = false;
+    private float movementSpeed = 0.0f;
+    private Vector3 lastPosition = Vector3.zero;
 
     public Animator anim;
 
@@ -53,10 +55,6 @@ public class AllyBehaviour : MonoBehaviour {
 
         float move = GetComponent<Rigidbody>().velocity.magnitude;
 
-        //Debug.Log(move);
-
-        //anim.SetFloat("Speed", move);
-
         foreach (GameObject ally in allies)
         {
             if (Vector3.Distance(transform.position, ally.transform.position) < allyDistance)
@@ -71,8 +69,7 @@ public class AllyBehaviour : MonoBehaviour {
         }
 
         if (Vector3.Distance(transform.position, targetTransform) > minRange)
-        {
-            anim.SetFloat("Speed", 1);
+        {            
             allyAI.SetDestination(targetTransform);
 		}
 
@@ -84,6 +81,14 @@ public class AllyBehaviour : MonoBehaviour {
             }
         }		
 	}
+
+    void FixedUpdate()
+    {
+        movementSpeed = (transform.position - lastPosition).magnitude;
+        lastPosition = transform.position;
+
+        anim.SetFloat("Speed", movementSpeed);
+    }
 
 	public void newPosition(Vector3 newPos)
 	{
@@ -105,13 +110,11 @@ public class AllyBehaviour : MonoBehaviour {
         }
 
         targetTransform = transform.position;
-        anim.SetFloat("Speed", 0);
     }
 
     public void FindCover()
     {
         state = AllyState.MOVING;
-        //anim.SetTrigger(CombatIdle);
 
         GameObject[] covers;
         covers = GameObject.FindGameObjectsWithTag("Cover");
