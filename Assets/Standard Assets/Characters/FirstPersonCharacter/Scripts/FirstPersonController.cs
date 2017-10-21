@@ -32,6 +32,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         public GameObject[] allies;
 
+        public GameObject selectedAlly;
+
         private GameObject pointer;
 
         private bool m_Jump;
@@ -134,6 +136,41 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     }
                 }
             }
+
+            if (Input.GetMouseButtonDown (1))
+            {
+                Debug.Log("Right mouse pressed");
+
+                RaycastHit hit;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+                if (Physics.Raycast(ray, out hit))
+                {
+                    if (hit.transform.tag == "Ally")
+                    {
+                        Debug.Log("Selected ally");
+
+                        selectedAlly = hit.transform.gameObject;
+                    }
+                }
+
+
+            }
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                Debug.Log("Left mouse pressed");
+
+                if (selectedAlly)
+                {
+                    Debug.Log("Moving ally");
+
+                    selectedAlly.GetComponent<AllyBehaviour>().state = AllyState.MOVING;
+
+                    selectedAlly.GetComponent<AllyBehaviour>().newPosition(pointer.transform.position);
+                }
+            }
+
         }
 
 
