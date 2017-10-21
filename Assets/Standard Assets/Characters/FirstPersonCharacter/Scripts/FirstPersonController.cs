@@ -163,11 +163,24 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
                 if (selectedAlly)
                 {
-                    Debug.Log("Moving ally");
+                    RaycastHit hit;
+                    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-                    selectedAlly.GetComponent<AllyBehaviour>().state = AllyState.MOVING;
+                    if (Physics.Raycast(ray, out hit))
+                    {
+                        if (hit.transform.tag == "Cover")
+                        {
+                            Debug.Log("Moving ally to cover");
 
-                    selectedAlly.GetComponent<AllyBehaviour>().newPosition(pointer.transform.position);
+                            selectedAlly.GetComponent<AllyBehaviour>().MoveToCover(hit.transform.gameObject);
+                        }
+                    }
+
+                    //Debug.Log("Moving ally");
+
+                    //selectedAlly.GetComponent<AllyBehaviour>().state = AllyState.MOVING;
+
+                    //selectedAlly.GetComponent<AllyBehaviour>().newPosition(pointer.transform.position);
                 }
             }
 

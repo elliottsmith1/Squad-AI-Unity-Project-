@@ -164,5 +164,48 @@ public class AllyBehaviour : MonoBehaviour {
                 }
             }
         }
-    }    
+    }
+
+    public void MoveToCover(GameObject newCover)
+    {
+        GameObject closest = null;
+
+        state = AllyState.MOVING;
+
+
+        int spots = 3;
+        foreach (Transform child in newCover.transform)
+            {
+                if (child.tag == "CoverPoint")
+                {
+                    if (child.GetComponent<CoverPoint>().Occupied == true)
+                    {
+                        spots--;
+                    }
+                }
+            }
+
+        if (spots > 0)
+        {
+            closest = newCover;
+        }
+
+
+        if (closest != null)
+        {
+            foreach (Transform child in closest.transform)
+            {
+                if (child.tag == "CoverPoint")
+                {
+                    if (child.GetComponent<CoverPoint>().Occupied == false)
+                    {
+                        child.GetComponent<CoverPoint>().Occupied = true;
+                        newPosition(child.transform.position);
+                        movingToCover = true;
+                        return;
+                    }
+                }
+            }
+        }
+    }
 }
