@@ -6,6 +6,7 @@ public class Fighter : MonoBehaviour {
 
     public GameObject enemy;
     public Animator anim;
+    private Light gunLight;
 
     private int lookSpeed = 8;
 
@@ -13,6 +14,8 @@ public class Fighter : MonoBehaviour {
     void Start ()
     {
         anim = GetComponent<Animator>();
+
+        gunLight = GetComponentInChildren<Light>();
     }
 	
 	// Update is called once per frame
