@@ -139,8 +139,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             if (Input.GetMouseButtonDown (1))
             {
-                Debug.Log("Right mouse pressed");
-
                 RaycastHit hit;
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
@@ -148,9 +146,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 {
                     if (hit.transform.tag == "Ally")
                     {
-                        Debug.Log("Selected ally");
+                        if (selectedAlly)
+                        {
+                            selectedAlly.GetComponentInChildren<Light>().enabled = false;
+                        }
 
                         selectedAlly = hit.transform.gameObject;
+
+                        selectedAlly.GetComponentInChildren<Light>().enabled = true;
                     }
                 }
 
@@ -159,8 +162,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             if (Input.GetMouseButtonDown(0))
             {
-                Debug.Log("Left mouse pressed");
-
                 if (selectedAlly)
                 {
                     RaycastHit hit;
@@ -170,17 +171,19 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     {
                         if (hit.transform.tag == "Cover")
                         {
-                            Debug.Log("Moving ally to cover");
-
                             selectedAlly.GetComponent<AllyBehaviour>().MoveToCover(hit.transform.gameObject);
                         }
-                    }
 
-                    //Debug.Log("Moving ally");
+                        else
+                        {
+                            if (!selectedAlly.GetComponent<AllyBehaviour>().movingToCover)
+                            {
+                                selectedAlly.GetComponent<AllyBehaviour>().state = AllyState.MOVING;
 
-                    //selectedAlly.GetComponent<AllyBehaviour>().state = AllyState.MOVING;
-
-                    //selectedAlly.GetComponent<AllyBehaviour>().newPosition(pointer.transform.position);
+                                selectedAlly.GetComponent<AllyBehaviour>().newPosition(pointer.transform.position);
+                            }
+                        }
+                    }                    
                 }
             }
 
