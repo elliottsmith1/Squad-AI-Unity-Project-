@@ -7,7 +7,9 @@ public enum AllyState
     COVER,
     FOLLOWING,
     STOPPED,
-    MOVING
+    MOVING,
+    SHOOTING,
+    COVERSHOOTING
 }
 
 public class AllyBehaviour : MonoBehaviour {
@@ -16,14 +18,17 @@ public class AllyBehaviour : MonoBehaviour {
 	public float speed = 3.0f;
 	private UnityEngine.AI.NavMeshAgent allyAI;
     public float minRange = 1;
-    private float allyDistance = 0.75f;
+    private float allyDistance = 1.0f;
     public bool movingToCover = false;
     private float movementSpeed = 0.0f;
     private Vector3 lastPosition = Vector3.zero;
+    private bool firing = false;
 
-    public Animator anim;
+    private Animator anim;
 
     public AllyState state;
+
+    public ParticleSystem gunLight;
 
     private GameObject player;
     List<GameObject> allies = new List<GameObject>();
@@ -47,13 +52,23 @@ public class AllyBehaviour : MonoBehaviour {
 
         allyAI = GetComponent<UnityEngine.AI.NavMeshAgent> ();
 
-        player = GameObject.FindGameObjectWithTag("Player");        
+        player = GameObject.FindGameObjectWithTag("Player");
     }
 	
 	// Update is called once per frame
 	void Update () {
 
         float move = GetComponent<Rigidbody>().velocity.magnitude;
+
+        if (firing)
+        {
+            if ((state != AllyState.COVERSHOOTING) && (state != AllyState.SHOOTING))
+            {
+                firing = false;
+
+                //CancelInvoke();
+            }
+        }
 
         foreach (GameObject ally in allies)
         {
@@ -68,6 +83,16 @@ public class AllyBehaviour : MonoBehaviour {
             targetTransform = player.transform.position;
         }
 
+        else if ((state == AllyState.SHOOTING) || (state == AllyState.COVERSHOOTING))
+        {
+            if (!firing)
+            {
+                firing = true;
+
+                //InvokeRepeating("GunFlash", 1, 1);
+            }
+        }
+
         if (Vector3.Distance(transform.position, targetTransform) > minRange)
         {            
             allyAI.SetDestination(targetTransform);
@@ -75,7 +100,7 @@ public class AllyBehaviour : MonoBehaviour {
 
         else
         {
-            if (state != AllyState.COVER)
+            if ((state != AllyState.COVER) && (state != AllyState.COVERSHOOTING) && (state != AllyState.SHOOTING))
             {
                 stopMoving();
             }
@@ -172,7 +197,6 @@ public class AllyBehaviour : MonoBehaviour {
 
         state = AllyState.MOVING;
 
-
         int spots = 3;
         foreach (Transform child in newCover.transform)
             {
@@ -207,5 +231,46 @@ public class AllyBehaviour : MonoBehaviour {
                 }
             }
         }
+    }
+
+    public void NewEnemy()
+    {
+        stopMoving();        
+
+        if (state == AllyState.COVER)
+        {
+            state = AllyState.COVERSHOOTING;
+        }
+
+        else
+        {
+            state = AllyState.SHOOTING;
+        }
+
+        anim.SetBool("CombatShoot", true);
+
+        InvokeRepeating("GunFlash", 1, 1);
+    }
+
+    public void NoEnemy()
+    {
+        anim.SetBool("CombatShoot", false);
+
+        CancelInvoke();
+
+        if (state == AllyState.COVERSHOOTING)
+        {
+            state = AllyState.COVER;
+        }
+
+        else
+        {
+            state = AllyState.STOPPED;
+        }
+    }
+
+    private void GunFlash()
+    {
+        gunLight.Play();
     }
 }

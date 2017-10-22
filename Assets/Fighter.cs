@@ -4,18 +4,15 @@ using UnityEngine;
 
 public class Fighter : MonoBehaviour {
 
-    public GameObject enemy;
-    public Animator anim;
-    private Light gunLight;
+    private GameObject enemy;
+    public AllyBehaviour soldier;
 
     private int lookSpeed = 8;
 
     // Use this for initialization
     void Start ()
     {
-        anim = GetComponent<Animator>();
-
-        gunLight = GetComponentInChildren<Light>();
+        soldier = GetComponent<AllyBehaviour>();
     }
 	
 	// Update is called once per frame
@@ -23,8 +20,6 @@ public class Fighter : MonoBehaviour {
     {
         if (enemy)
         {
-            //transform.LookAt(enemy.transform.position);
-
             transform.rotation = Quaternion.Slerp(transform.rotation, (Quaternion.LookRotation(enemy.transform.position - transform.position)), Time.deltaTime * lookSpeed);
         }
     }
@@ -32,11 +27,14 @@ public class Fighter : MonoBehaviour {
     public void newEnemy(GameObject enmy)
     {
         enemy = enmy;
-        anim.SetBool("CombatShoot", true);
+
+        soldier.NewEnemy();        
     }
 
     public void NoEnemy()
     {
-        anim.SetBool("CombatShoot", false);
+        enemy = null;
+
+        soldier.NoEnemy();
     }
 }

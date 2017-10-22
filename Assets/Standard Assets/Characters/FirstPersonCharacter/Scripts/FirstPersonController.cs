@@ -34,6 +34,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         public GameObject selectedAlly;
 
+        private bool allSelected = false;
+
         private GameObject pointer;
 
         private bool m_Jump;
@@ -48,6 +50,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private float m_NextStep;
         private bool m_Jumping;
         private AudioSource m_AudioSource;
+        private float selectionTimer = 0.0f;
 
         // Use this for initialization
         private void Start()
@@ -137,6 +140,24 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 }
             }
 
+            if (Input.GetMouseButton(1))
+            {
+                selectionTimer += Time.deltaTime;
+
+                if (selectionTimer > 1)
+                {
+                    selectedAlly = null;
+                    allSelected = true;
+
+                    AlliesSelected();
+                }
+            }
+
+            if (Input.GetMouseButtonUp(1))
+            {
+                selectionTimer = 0.0f;
+            }
+
             if (Input.GetMouseButtonDown (1))
             {
                 RaycastHit hit;
@@ -146,23 +167,23 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 {
                     if (hit.transform.tag == "Ally")
                     {
-                        if (selectedAlly)
-                        {
-                            selectedAlly.GetComponentInChildren<Light>().enabled = false;
-                        }
+                        AlliesDeselected();
 
                         selectedAlly = hit.transform.gameObject;
 
                         selectedAlly.GetComponentInChildren<Light>().enabled = true;
                     }
                 }
-
-
             }
 
             if (Input.GetMouseButtonDown(0))
             {
-                if (selectedAlly)
+                if ((!selectedAlly) && (!allSelected))
+                {
+                    return;
+                }
+
+                //if (selectedAlly)
                 {
                     RaycastHit hit;
                     Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -171,16 +192,63 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     {
                         if (hit.transform.tag == "Cover")
                         {
-                            selectedAlly.GetComponent<AllyBehaviour>().MoveToCover(hit.transform.gameObject);
+                            if (allSelected)
+                            {
+                                foreach (GameObject ally in allies)
+                                {
+                                    if ((ally.GetComponent<AllyBehaviour>().state == AllyState.SHOOTING) || (ally.GetComponent<AllyBehaviour>().state == AllyState.COVERSHOOTING))
+                                    {
+                                        ally.GetComponent<AllyBehaviour>().NoEnemy();                                        
+                                    }
+
+                                    ally.GetComponent<AllyBehaviour>().MoveToCover(hit.transform.gameObject);
+                                }
+                            }
+
+                            else
+                            {
+                                if ((selectedAlly.GetComponent<AllyBehaviour>().state == AllyState.SHOOTING) || (selectedAlly.GetComponent<AllyBehaviour>().state == AllyState.COVERSHOOTING))
+                                {
+                                    selectedAlly.GetComponent<AllyBehaviour>().NoEnemy();
+                                }
+
+                                selectedAlly.GetComponent<AllyBehaviour>().MoveToCover(hit.transform.gameObject);
+                            }
                         }
 
                         else
                         {
-                            if (!selectedAlly.GetComponent<AllyBehaviour>().movingToCover)
+                            if (allSelected)
                             {
-                                selectedAlly.GetComponent<AllyBehaviour>().state = AllyState.MOVING;
+                                foreach (GameObject ally in allies)
+                                {
+                                    if (!ally.GetComponent<AllyBehaviour>().movingToCover)
+                                    {
+                                        if ((ally.GetComponent<AllyBehaviour>().state == AllyState.SHOOTING) || (ally.GetComponent<AllyBehaviour>().state == AllyState.COVERSHOOTING))
+                                        {
+                                            ally.GetComponent<AllyBehaviour>().NoEnemy();
+                                        }
 
-                                selectedAlly.GetComponent<AllyBehaviour>().newPosition(pointer.transform.position);
+                                        ally.GetComponent<AllyBehaviour>().state = AllyState.MOVING;
+
+                                        ally.GetComponent<AllyBehaviour>().newPosition(pointer.transform.position);
+                                    }
+                                }
+                            }
+
+                            else
+                            {
+                                if (!selectedAlly.GetComponent<AllyBehaviour>().movingToCover)
+                                {
+                                    if ((selectedAlly.GetComponent<AllyBehaviour>().state == AllyState.SHOOTING) || (selectedAlly.GetComponent<AllyBehaviour>().state == AllyState.COVERSHOOTING))
+                                    {
+                                        selectedAlly.GetComponent<AllyBehaviour>().NoEnemy();
+                                    }
+
+                                    selectedAlly.GetComponent<AllyBehaviour>().state = AllyState.MOVING;
+
+                                    selectedAlly.GetComponent<AllyBehaviour>().newPosition(pointer.transform.position);
+                                }
                             }
                         }
                     }                    
@@ -195,6 +263,24 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_AudioSource.clip = m_LandSound;
             //m_AudioSource.Play();
             m_NextStep = m_StepCycle + .5f;
+        }
+
+        private void AlliesSelected()
+        {
+            foreach (GameObject ally in allies)
+            {
+                ally.GetComponentInChildren<Light>().enabled = true;              
+            }
+        }
+
+        private void AlliesDeselected()
+        {
+            allSelected = false;
+
+            foreach (GameObject ally in allies)
+            {
+                ally.GetComponentInChildren<Light>().enabled = false;
+            }
         }
 
 
