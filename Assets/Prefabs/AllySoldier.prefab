@@ -639,7 +639,7 @@ Transform:
   m_GameObject: {fileID: 1154290982913340}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1.28, z: 0}
-  m_LocalScale: {x: 1, y: 0.55, z: 1}
+  m_LocalScale: {x: 1, y: 0.55, z: 1.5}
   m_Children: []
   m_Father: {fileID: 4662930708034070}
   m_RootOrder: 3
@@ -848,9 +848,9 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1069939890309682}
-  m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 2.81, y: 21.51, z: 1.35}
-  m_LocalScale: {x: 1, y: 0.99999964, z: 0.99999964}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -18.755611, y: -17.64742, z: 22.224724}
+  m_LocalScale: {x: 0.75, y: 0.7500004, z: 0.7500004}
   m_Children:
   - {fileID: 4603910361620090}
   - {fileID: 4728871689323998}
@@ -993,7 +993,7 @@ Light:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1840381020078398}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 8
   m_Type: 0
   m_Color: {r: 0, g: 1, b: 0.08965516, a: 1}
@@ -1029,12 +1029,11 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1069939890309682}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 27da17e68fdb5964bae2c095e962afee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  soldier: {fileID: 0}
 --- !u!114 &114489007905284582
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1050,6 +1049,8 @@ MonoBehaviour:
   speed: 2
   minRange: 5
   movingToCover: 0
+  bullet: {fileID: 1986161329673824, guid: cc024e711e5f938498d9a4d731f6b9c5, type: 2}
+  health: 100
   state: 2
   gunLight: {fileID: 198460777259355766}
 --- !u!114 &114962590815382596

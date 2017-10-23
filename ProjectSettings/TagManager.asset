@@ -9,6 +9,8 @@ TagManager:
   - CoverPoint
   - Cover
   - Enemy
+  - Bullet
+  - EnemyBullet
   layers:
   - Default
   - TransparentFX

@@ -5,7 +5,7 @@ using UnityEngine;
 public class Fighter : MonoBehaviour {
 
     private GameObject enemy;
-    public AllyBehaviour soldier;
+    private AllyBehaviour soldier;
 
     private int lookSpeed = 8;
 

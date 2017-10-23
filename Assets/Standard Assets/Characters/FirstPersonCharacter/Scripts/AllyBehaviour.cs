@@ -23,6 +23,9 @@ public class AllyBehaviour : MonoBehaviour {
     private float movementSpeed = 0.0f;
     private Vector3 lastPosition = Vector3.zero;
     private bool firing = false;
+    public GameObject bullet;
+    public int health = 100;
+
 
     private Animator anim;
 
@@ -65,8 +68,6 @@ public class AllyBehaviour : MonoBehaviour {
             if ((state != AllyState.COVERSHOOTING) && (state != AllyState.SHOOTING))
             {
                 firing = false;
-
-                //CancelInvoke();
             }
         }
 
@@ -272,5 +273,40 @@ public class AllyBehaviour : MonoBehaviour {
     private void GunFlash()
     {
         gunLight.Play();
+
+        Vector3 bulletPos = gunLight.transform.position;
+        
+        GameObject clone = Instantiate(bullet, bulletPos, transform.rotation);
+
+        // start with a perfect shot
+        Vector3 divergence = Vector3.zero;
+        // then we want to randomize the rotation around the X axis
+        divergence.x = (1 - 2 * Random.value) * 5;
+        // and the rotation around the Y axis
+        divergence.y = (1 - 2 * Random.value) * 5;
+
+        clone.transform.Rotate(divergence);
+
+        clone.transform.localScale *= 2;
+
+        clone.GetComponent<Rigidbody>().AddForce(clone.transform.forward * 50);
+    }
+
+    void OnTriggerEnter(Collider c)
+    {
+        if (((tag == "Enemy") && (c.tag == "Bullet")) || ((tag == "Ally") && (c.tag == "EnemyBullet")))
+        {
+            if ((state == AllyState.COVER) || (state == AllyState.COVERSHOOTING))
+            {
+                health -= 5;
+            }
+
+            else
+            {
+                health -= 10;
+            }
+
+            //Destroy(c.gameObject);
+        }        
     }
 }
