@@ -18,18 +18,18 @@ public class FighterDetection : MonoBehaviour {
 		
 	}
 
-    void OnTriggerEnter(Collider c)
-    {
-        if ((parentGameobject.tag == "Enemy") && (c.tag == "Ally"))
-        {
-            parentGameobject.GetComponent<Fighter>().newEnemy(c.transform.gameObject);
-        }
+    //void OnTriggerEnter(Collider c)
+    //{
+    //    if ((parentGameobject.tag == "Enemy") && (c.tag == "Ally"))
+    //    {
+    //        parentGameobject.GetComponent<Fighter>().newEnemy(c.transform.gameObject);
+    //    }
 
-        else if ((parentGameobject.tag == "Ally") && (c.tag == "Enemy"))
-        {
-            parentGameobject.GetComponent<Fighter>().newEnemy(c.transform.gameObject);
-        }
-    }
+    //    else if ((parentGameobject.tag == "Ally") && (c.tag == "Enemy"))
+    //    {
+    //        parentGameobject.GetComponent<Fighter>().newEnemy(c.transform.gameObject);
+    //    }
+    //}
 
     void OnTriggerExit(Collider c)
     {
@@ -45,4 +45,23 @@ public class FighterDetection : MonoBehaviour {
             parentGameobject.GetComponent<Fighter>().NoEnemy();
         }
     }
-}
+
+    void OnTriggerStay(Collider c)
+    {
+        if (parentGameobject.GetComponent<Fighter>().GetEnemy() == null)
+        {
+            if (!parentGameobject.GetComponent<Fighter>().GetMovingToCover())
+            {
+                if ((parentGameobject.tag == "Enemy") && (c.tag == "Ally"))
+                {
+                    parentGameobject.GetComponent<Fighter>().newEnemy(c.transform.gameObject);
+                }
+
+                else if ((parentGameobject.tag == "Ally") && (c.tag == "Enemy"))
+                {
+                    parentGameobject.GetComponent<Fighter>().newEnemy(c.transform.gameObject);
+                }
+            }
+        }
+    }
+ }

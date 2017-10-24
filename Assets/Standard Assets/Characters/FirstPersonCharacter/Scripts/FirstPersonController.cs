@@ -163,7 +163,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 RaycastHit hit;
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-                if (Physics.Raycast(ray, out hit))
+                if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hit))
                 {
                     if (hit.transform.tag == "Ally")
                     {
@@ -188,7 +188,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     RaycastHit hit;
                     Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-                    if (Physics.Raycast(ray, out hit))
+                    if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hit))
                     {
                         if (hit.transform.tag == "Cover")
                         {
@@ -198,7 +198,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                                 {
                                     if ((ally.GetComponent<AllyBehaviour>().state == AllyState.SHOOTING) || (ally.GetComponent<AllyBehaviour>().state == AllyState.COVERSHOOTING))
                                     {
-                                        ally.GetComponent<AllyBehaviour>().NoEnemy();                                        
+                                        ally.GetComponent<Fighter>().NoEnemy();                                        
                                     }
 
                                     ally.GetComponent<AllyBehaviour>().MoveToCover(hit.transform.gameObject);
@@ -209,7 +209,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                             {
                                 if ((selectedAlly.GetComponent<AllyBehaviour>().state == AllyState.SHOOTING) || (selectedAlly.GetComponent<AllyBehaviour>().state == AllyState.COVERSHOOTING))
                                 {
-                                    selectedAlly.GetComponent<AllyBehaviour>().NoEnemy();
+                                    selectedAlly.GetComponent<Fighter>().NoEnemy();
                                 }
 
                                 selectedAlly.GetComponent<AllyBehaviour>().MoveToCover(hit.transform.gameObject);
@@ -226,7 +226,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                                     {
                                         if ((ally.GetComponent<AllyBehaviour>().state == AllyState.SHOOTING) || (ally.GetComponent<AllyBehaviour>().state == AllyState.COVERSHOOTING))
                                         {
-                                            ally.GetComponent<AllyBehaviour>().NoEnemy();
+                                            ally.GetComponent<Fighter>().NoEnemy();
                                         }
 
                                         ally.GetComponent<AllyBehaviour>().state = AllyState.MOVING;
@@ -242,7 +242,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                                 {
                                     if ((selectedAlly.GetComponent<AllyBehaviour>().state == AllyState.SHOOTING) || (selectedAlly.GetComponent<AllyBehaviour>().state == AllyState.COVERSHOOTING))
                                     {
-                                        selectedAlly.GetComponent<AllyBehaviour>().NoEnemy();
+                                        selectedAlly.GetComponent<Fighter>().NoEnemy();
                                     }
 
                                     selectedAlly.GetComponent<AllyBehaviour>().state = AllyState.MOVING;

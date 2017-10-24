@@ -17,14 +17,14 @@ public class AllyBehaviour : MonoBehaviour {
 	public Vector3 targetTransform = new Vector3(0, 1.0f, 0);
 	public float speed = 3.0f;
 	private UnityEngine.AI.NavMeshAgent allyAI;
-    public float minRange = 1;
+    public float minRange = 0.1f;
     private float allyDistance = 1.0f;
     public bool movingToCover = false;
     private float movementSpeed = 0.0f;
     private Vector3 lastPosition = Vector3.zero;
-    private bool firing = false;
     public GameObject bullet;
-    public int health = 100;
+    public int health = 50;
+    private float accuracy = 5;
 
 
     private Animator anim;
@@ -32,6 +32,8 @@ public class AllyBehaviour : MonoBehaviour {
     public AllyState state;
 
     public ParticleSystem gunLight;
+
+    public ParticleSystem deathExplosion;
 
     private GameObject player;
     List<GameObject> allies = new List<GameObject>();
@@ -49,13 +51,18 @@ public class AllyBehaviour : MonoBehaviour {
             {
                 allies.Add(ally);
             }
-        }
-
-        stopMoving();
+        }        
 
         allyAI = GetComponent<UnityEngine.AI.NavMeshAgent> ();
 
+        stopMoving();
+
         player = GameObject.FindGameObjectWithTag("Player");
+
+        if (tag == "Ally")
+        {
+            accuracy /= 2.5f;
+        }
     }
 	
 	// Update is called once per frame
@@ -63,49 +70,29 @@ public class AllyBehaviour : MonoBehaviour {
 
         float move = GetComponent<Rigidbody>().velocity.magnitude;
 
-        if (firing)
-        {
-            if ((state != AllyState.COVERSHOOTING) && (state != AllyState.SHOOTING))
-            {
-                firing = false;
-            }
-        }
-
-        foreach (GameObject ally in allies)
-        {
-            if (Vector3.Distance(transform.position, ally.transform.position) < allyDistance)
-            {                
-                transform.position = Vector3.MoveTowards(transform.position, ally.transform.position, -1 * speed * Time.deltaTime);
-            }
-        }
+        //foreach (GameObject ally in allies)
+        //{
+        //    if (Vector3.Distance(transform.position, ally.transform.position) < allyDistance)
+        //    {                
+        //        transform.position = Vector3.MoveTowards(transform.position, ally.transform.position, -1 * speed * Time.deltaTime);
+        //    }
+        //}
 
         if (state == AllyState.FOLLOWING)
         {
             targetTransform = player.transform.position;
         }
 
-        else if ((state == AllyState.SHOOTING) || (state == AllyState.COVERSHOOTING))
+        if ((movingToCover) && (movementSpeed == 0))
         {
-            if (!firing)
-            {
-                firing = true;
+            stopMoving();
+        }	
 
-                //InvokeRepeating("GunFlash", 1, 1);
-            }
+        if (health <= 0)
+        {
+            Instantiate(deathExplosion, transform.position, transform.rotation);
+            Destroy(this.gameObject);
         }
-
-        if (Vector3.Distance(transform.position, targetTransform) > minRange)
-        {            
-            allyAI.SetDestination(targetTransform);
-		}
-
-        else
-        {
-            if ((state != AllyState.COVER) && (state != AllyState.COVERSHOOTING) && (state != AllyState.SHOOTING))
-            {
-                stopMoving();
-            }
-        }		
 	}
 
     void FixedUpdate()
@@ -119,11 +106,12 @@ public class AllyBehaviour : MonoBehaviour {
 	public void newPosition(Vector3 newPos)
 	{
 		targetTransform = newPos;
-	}
+        allyAI.SetDestination(targetTransform);
+    }
 
     public void stopMoving()
     {
-        if (movingToCover == true)
+        if (movingToCover)
         {
             movingToCover = false;
             state = AllyState.COVER;
@@ -136,6 +124,8 @@ public class AllyBehaviour : MonoBehaviour {
         }
 
         targetTransform = transform.position;
+
+        allyAI.ResetPath();
     }
 
     public void FindCover()
@@ -236,7 +226,7 @@ public class AllyBehaviour : MonoBehaviour {
 
     public void NewEnemy()
     {
-        stopMoving();        
+        //stopMoving();        
 
         if (state == AllyState.COVER)
         {
@@ -281,32 +271,19 @@ public class AllyBehaviour : MonoBehaviour {
         // start with a perfect shot
         Vector3 divergence = Vector3.zero;
         // then we want to randomize the rotation around the X axis
-        divergence.x = (1 - 2 * Random.value) * 5;
+        divergence.x = (1 - 2 * Random.value) * accuracy;
         // and the rotation around the Y axis
-        divergence.y = (1 - 2 * Random.value) * 5;
+        divergence.y = (1 - 2 * Random.value) * accuracy;
 
         clone.transform.Rotate(divergence);
 
         clone.transform.localScale *= 2;
 
-        clone.GetComponent<Rigidbody>().AddForce(clone.transform.forward * 50);
+        clone.GetComponent<Rigidbody>().AddForce(clone.transform.forward * 2000);
     }
 
-    void OnTriggerEnter(Collider c)
+    public void NewHealth(int hlth)
     {
-        if (((tag == "Enemy") && (c.tag == "Bullet")) || ((tag == "Ally") && (c.tag == "EnemyBullet")))
-        {
-            if ((state == AllyState.COVER) || (state == AllyState.COVERSHOOTING))
-            {
-                health -= 5;
-            }
-
-            else
-            {
-                health -= 10;
-            }
-
-            //Destroy(c.gameObject);
-        }        
+        health += hlth;
     }
 }
