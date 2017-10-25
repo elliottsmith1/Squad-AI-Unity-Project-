@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
 using UnityStandardAssets.Utility;
 using Random = UnityEngine.Random;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace UnityStandardAssets.Characters.FirstPerson
 {
@@ -30,7 +32,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private Camera m_Camera;
 
-        public GameObject[] allies;
+        //public GameObject[] allies;
+
+        public List<GameObject> allies = new List<GameObject>();
 
         public GameObject selectedAlly;
 
@@ -66,7 +70,13 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_AudioSource = GetComponent<AudioSource>();
 			m_MouseLook.Init(transform , m_Camera.transform);
 
-            allies = GameObject.FindGameObjectsWithTag("Ally");
+            foreach (GameObject ally in GameObject.FindGameObjectsWithTag("Ally"))
+            {
+                if (ally != this)
+                {
+                    allies.Add(ally);
+                }
+            }
 
             pointer = GameObject.FindGameObjectWithTag("Pointer");
         }
@@ -75,6 +85,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
         // Update is called once per frame
         private void Update()
         {
+            allies.RemoveAll(item => item == null);
+
             RotateView();
             // the jump state needs to read here to make sure it is not missed
             if (!m_Jump)

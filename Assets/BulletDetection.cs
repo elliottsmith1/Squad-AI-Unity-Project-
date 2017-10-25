@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class BulletDetection : MonoBehaviour {
 
-    private float lifeSpan = 0.0f;
-
 	// Use this for initialization
 	void Start () {
 		
@@ -13,13 +11,6 @@ public class BulletDetection : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
-        lifeSpan += Time.deltaTime;
-
-        if (lifeSpan > 3)
-        {
-            Destroy(this.gameObject);
-        }
 		
 	}
 

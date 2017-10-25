@@ -1051,7 +1051,7 @@ MonoBehaviour:
   minRange: 5
   movingToCover: 0
   bullet: {fileID: 1634453603556118, guid: 8ca7550caa749af4ebe8b4590f678be2, type: 2}
-  health: 100
+  health: 50
   state: 2
   gunLight: {fileID: 198494959004294322}
   deathExplosion: {fileID: 198982110590717260, guid: 65eac4b9277ab3b4ea33bfbbafd07379,

@@ -18,14 +18,13 @@ public class AllyBehaviour : MonoBehaviour {
 	public float speed = 3.0f;
 	private UnityEngine.AI.NavMeshAgent allyAI;
     public float minRange = 0.1f;
-    private float allyDistance = 1.0f;
+    private float allyDistance = 5.0f;
     public bool movingToCover = false;
     private float movementSpeed = 0.0f;
     private Vector3 lastPosition = Vector3.zero;
     public GameObject bullet;
     public int health = 50;
     private float accuracy = 5;
-
 
     private Animator anim;
 
@@ -45,13 +44,27 @@ public class AllyBehaviour : MonoBehaviour {
 
         anim = GetComponent<Animator>();
 
-        foreach (GameObject ally in GameObject.FindGameObjectsWithTag("Ally"))
+        if (tag == "Ally")
         {
-            if (ally != this)
+            foreach (GameObject ally in GameObject.FindGameObjectsWithTag("Ally"))
             {
-                allies.Add(ally);
+                if (ally != this)
+                {
+                    allies.Add(ally);
+                }
             }
-        }        
+        }
+
+        else if (tag == "Enemy")
+        {
+            foreach (GameObject ally in GameObject.FindGameObjectsWithTag("Enemy"))
+            {
+                if (ally != this)
+                {
+                    allies.Add(ally);
+                }
+            }
+        }
 
         allyAI = GetComponent<UnityEngine.AI.NavMeshAgent> ();
 
@@ -68,25 +81,39 @@ public class AllyBehaviour : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+        allies.RemoveAll(item => item == null);
+
         float move = GetComponent<Rigidbody>().velocity.magnitude;
 
-        //foreach (GameObject ally in allies)
-        //{
-        //    if (Vector3.Distance(transform.position, ally.transform.position) < allyDistance)
-        //    {                
-        //        transform.position = Vector3.MoveTowards(transform.position, ally.transform.position, -1 * speed * Time.deltaTime);
-        //    }
-        //}
+        if ((state == AllyState.STOPPED) || (state == AllyState.SHOOTING))
+        {
+            foreach (GameObject ally in allies)
+            {
+                if (Vector3.Distance(transform.position, ally.transform.position) < allyDistance)
+                {
+                    Vector3 pos = transform.position - ally.transform.position;
+
+                    Vector3 runTo = transform.position + ((transform.position - ally.transform.position) * 3);
+
+                    pos *= -5;
+
+                    pos.y = transform.position.y;
+
+                    newPosition(runTo);
+                    //transform.position = Vector3.MoveTowards(transform.position, ally.transform.position, -1 * speed * Time.deltaTime);
+                }
+            }
+        }
 
         if (state == AllyState.FOLLOWING)
         {
-            targetTransform = player.transform.position;
+            newPosition(player.transform.position);
         }
 
-        if ((movingToCover) && (movementSpeed == 0))
+        if ((state == AllyState.MOVING) && (movementSpeed == 0) && (allyAI.remainingDistance < 1))
         {
             stopMoving();
-        }	
+        }
 
         if (health <= 0)
         {
@@ -228,19 +255,22 @@ public class AllyBehaviour : MonoBehaviour {
     {
         //stopMoving();        
 
-        if (state == AllyState.COVER)
+        if (!movingToCover)
         {
-            state = AllyState.COVERSHOOTING;
+            if (state == AllyState.COVER)
+            {
+                state = AllyState.COVERSHOOTING;
+            }
+
+            else
+            {
+                state = AllyState.SHOOTING;
+            }
+
+            anim.SetBool("CombatShoot", true);
+
+            InvokeRepeating("GunFlash", 1, 1);
         }
-
-        else
-        {
-            state = AllyState.SHOOTING;
-        }
-
-        anim.SetBool("CombatShoot", true);
-
-        InvokeRepeating("GunFlash", 1, 1);
     }
 
     public void NoEnemy()
