@@ -52,7 +52,7 @@ public class AllyBehaviour : MonoBehaviour {
 
             foreach (GameObject ally in GameObject.FindGameObjectsWithTag("Ally"))
             {
-                if (ally != this)
+                if (ally != this.gameObject)
                 {
                     allies.Add(ally);
                 }
@@ -63,7 +63,7 @@ public class AllyBehaviour : MonoBehaviour {
         {
             foreach (GameObject ally in GameObject.FindGameObjectsWithTag("Enemy"))
             {
-                if (ally != this)
+                if (ally != this.gameObject)
                 {
                     allies.Add(ally);
                 }
@@ -95,13 +95,24 @@ public class AllyBehaviour : MonoBehaviour {
                 {
                     Vector3 pos = transform.position - ally.transform.position;
 
-                    Vector3 runTo = transform.position + ((transform.position - ally.transform.position) * 3);
+                    Vector3 runTo = transform.position + ((transform.position - ally.transform.position) * 1);
 
                     pos *= -5;
 
                     pos.y = transform.position.y;
 
                     newPosition(runTo);
+                }
+            }
+        }
+
+        if (state == AllyState.MOVING)
+        {
+            foreach (GameObject ally in allies)
+            {
+                if (Vector3.Distance(transform.position, ally.transform.position) < 2)
+                {
+                    transform.position = Vector3.MoveTowards(transform.position, ally.transform.position, -1 * speed * Time.deltaTime);
                 }
             }
         }
@@ -146,6 +157,7 @@ public class AllyBehaviour : MonoBehaviour {
     {
         if (movingToCover)
         {
+            allyAI.stoppingDistance = 3;
             movingToCover = false;
             state = AllyState.COVER;
             anim.SetTrigger("CombatIdle");
@@ -206,6 +218,7 @@ public class AllyBehaviour : MonoBehaviour {
                         child.GetComponent<CoverPoint>().Occupied = true;
                         newPosition(child.transform.position);
                         movingToCover = true;
+                        allyAI.stoppingDistance = 0.1f;
                         return;
                     }
                 }
@@ -248,6 +261,7 @@ public class AllyBehaviour : MonoBehaviour {
                         child.GetComponent<CoverPoint>().Occupied = true;
                         newPosition(child.transform.position);
                         movingToCover = true;
+                        allyAI.stoppingDistance = 0.1f;
                         return;
                     }
                 }
