@@ -32,11 +32,15 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private Camera m_Camera;
 
-        //public GameObject[] allies;
+        [SerializeField] GameObject allyPrefab;
 
         public List<GameObject> allies = new List<GameObject>();
 
         public GameObject selectedAlly;
+
+        public GameObject selectedCover = null;
+
+        private GameObject allyLookedAt;
 
         private bool allSelected = false;
 
@@ -72,10 +76,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             foreach (GameObject ally in GameObject.FindGameObjectsWithTag("Ally"))
             {
-                if (ally != this)
-                {
-                    allies.Add(ally);
-                }
+                allies.Add(ally);
             }
 
             pointer = GameObject.FindGameObjectWithTag("Pointer");
@@ -108,18 +109,159 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             m_PreviouslyGrounded = m_CharacterController.isGrounded;
 
+            LookingAt();
+
+            CheckKeys();
+
+            CheckMouse();
+        }
+
+
+        private void PlayLandingSound()
+        {
+            m_AudioSource.clip = m_LandSound;
+            //m_AudioSource.Play();
+            m_NextStep = m_StepCycle + .5f;
+        }
+
+        private void AlliesSelected()
+        {
+            foreach (GameObject ally in allies)
+            {
+                ally.GetComponentInChildren<Light>().enabled = true;              
+            }
+        }
+
+        private void AlliesDeselected()
+        {
+            allSelected = false;
+
+            foreach (GameObject ally in allies)
+            {
+                ally.GetComponentInChildren<Light>().enabled = false;
+            }
+        }
+
+        private void CheckMouse()
+        {
+            if (Input.GetMouseButton(1))
+            {
+                selectionTimer += Time.deltaTime;
+
+                if (selectionTimer > 1)
+                {
+                    selectedAlly = null;
+                    allSelected = true;
+
+                    AlliesSelected();
+                }
+            }
+
+            if (Input.GetMouseButtonUp(1))
+            {
+                selectionTimer = 0.0f;
+            }
+
+            if (Input.GetMouseButtonDown(1))
+            {
+                RaycastHit hit;
+
+                if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hit))
+                {
+                    if (hit.transform.tag == "Ally")
+                    {
+                        AlliesDeselected();
+
+                        selectedAlly = hit.transform.gameObject;
+
+                        selectedAlly.GetComponentInChildren<Light>().enabled = true;
+                    }
+                }
+            }
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                if ((!selectedAlly) && (!allSelected))
+                {
+                    return;
+                }
+
+                if (selectedCover)
+                {
+                    if (allSelected)
+                    {
+                        foreach (GameObject ally in allies)
+                        {
+                            if ((ally.GetComponent<AllyBehaviour>().state == AllyState.SHOOTING) || (ally.GetComponent<AllyBehaviour>().state == AllyState.COVERSHOOTING))
+                            {
+                                ally.GetComponent<Fighter>().NoEnemy();
+                            }
+
+                            ally.GetComponent<AllyBehaviour>().MoveToCover(selectedCover);
+                        }
+                    }
+
+                    else if (selectedAlly)
+                    {
+                        if ((selectedAlly.GetComponent<AllyBehaviour>().state == AllyState.SHOOTING) || (selectedAlly.GetComponent<AllyBehaviour>().state == AllyState.COVERSHOOTING))
+                        {
+                            selectedAlly.GetComponent<Fighter>().NoEnemy();
+                        }
+
+                        selectedAlly.GetComponent<AllyBehaviour>().MoveToCover(selectedCover);
+                    }
+                }
+
+                else
+                {
+                    if (allSelected)
+                    {
+                        foreach (GameObject ally in allies)
+                        {
+                            if (!ally.GetComponent<AllyBehaviour>().movingToCover)
+                            {
+                                if ((ally.GetComponent<AllyBehaviour>().state == AllyState.SHOOTING) || (ally.GetComponent<AllyBehaviour>().state == AllyState.COVERSHOOTING))
+                                {
+                                    ally.GetComponent<Fighter>().NoEnemy();
+                                }
+
+                                ally.GetComponent<AllyBehaviour>().state = AllyState.MOVING;
+
+                                ally.GetComponent<AllyBehaviour>().newPosition(pointer.transform.position);
+                            }
+                        }
+                    }
+
+                    else if (selectedAlly)
+                    {
+                        if (!selectedAlly.GetComponent<AllyBehaviour>().movingToCover)
+                        {
+                            if ((selectedAlly.GetComponent<AllyBehaviour>().state == AllyState.SHOOTING) || (selectedAlly.GetComponent<AllyBehaviour>().state == AllyState.COVERSHOOTING))
+                            {
+                                selectedAlly.GetComponent<Fighter>().NoEnemy();
+                            }
+
+                            selectedAlly.GetComponent<AllyBehaviour>().state = AllyState.MOVING;
+
+                            selectedAlly.GetComponent<AllyBehaviour>().newPosition(pointer.transform.position);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void CheckKeys()
+        {
             if (CrossPlatformInputManager.GetButtonDown("Point"))
             {
+                GameObject obj = Instantiate(allyPrefab, pointer.transform.position, Quaternion.identity);
 
                 foreach (GameObject ally in allies)
                 {
-                    if (ally.GetComponent<AllyBehaviour>().movingToCover != true)
-                    {
-                        ally.GetComponent<AllyBehaviour>().state = AllyState.MOVING;
-
-                        ally.GetComponent<AllyBehaviour>().newPosition(pointer.transform.position);
-                    }
+                    ally.GetComponent<AllyBehaviour>().NewAlly(obj);
                 }
+
+                allies.Add(obj);                
             }
 
             if (Input.GetButtonDown("Follow"))
@@ -151,150 +293,61 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     }
                 }
             }
+        }
 
-            if (Input.GetMouseButton(1))
+        private void LookingAt()
+        {
+            RaycastHit hit2;
+
+            if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hit2))
             {
-                selectionTimer += Time.deltaTime;
-
-                if (selectionTimer > 1)
+                if (selectedCover)
                 {
-                    selectedAlly = null;
-                    allSelected = true;
-
-                    AlliesSelected();
-                }
-            }
-
-            if (Input.GetMouseButtonUp(1))
-            {
-                selectionTimer = 0.0f;
-            }
-
-            if (Input.GetMouseButtonDown (1))
-            {
-                RaycastHit hit;
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-                if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hit))
-                {
-                    if (hit.transform.tag == "Ally")
+                    if (hit2.transform.gameObject != selectedCover)
                     {
-                        AlliesDeselected();
+                        selectedCover.transform.Find("CoverCircle").gameObject.GetComponent<Renderer>().enabled = false;
+                        selectedCover = null;
+                    }
+                }
 
-                        selectedAlly = hit.transform.gameObject;
+                if (allyLookedAt)
+                {
+                    if (hit2.transform.gameObject != allyLookedAt)
+                    {
+                        allyLookedAt.transform.Find("AllyCircle").gameObject.GetComponent<Renderer>().enabled = false;
+                        allyLookedAt = null;
+                    }
+                }
 
-                        selectedAlly.GetComponentInChildren<Light>().enabled = true;
+                if (hit2.transform.tag == "Cover")
+                {
+                    if ((hit2.transform.gameObject != selectedCover) || (selectedCover == null))
+                    {
+                        if (selectedCover)
+                        {
+                            selectedCover.transform.Find("CoverCircle").gameObject.GetComponent<Renderer>().enabled = false;
+                        }
+
+                        selectedCover = hit2.transform.gameObject;
+                        selectedCover.transform.Find("CoverCircle").gameObject.GetComponent<Renderer>().enabled = true;
+                    }
+                }
+
+                else if (hit2.transform.tag == "Ally")
+                {
+                    if ((hit2.transform.gameObject != allyLookedAt) || (selectedCover == null))
+                    {
+                        if (allyLookedAt)
+                        {
+                            allyLookedAt.transform.Find("AllyCircle").gameObject.GetComponent<Renderer>().enabled = false;
+                        }
+
+                        allyLookedAt = hit2.transform.gameObject;
+                        allyLookedAt.transform.Find("AllyCircle").gameObject.GetComponent<Renderer>().enabled = true;
                     }
                 }
             }
-
-            if (Input.GetMouseButtonDown(0))
-            {
-                if ((!selectedAlly) && (!allSelected))
-                {
-                    return;
-                }
-
-                //if (selectedAlly)
-                {
-                    RaycastHit hit;
-                    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-                    if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hit))
-                    {
-                        if (hit.transform.tag == "Cover")
-                        {
-                            if (allSelected)
-                            {
-                                foreach (GameObject ally in allies)
-                                {
-                                    if ((ally.GetComponent<AllyBehaviour>().state == AllyState.SHOOTING) || (ally.GetComponent<AllyBehaviour>().state == AllyState.COVERSHOOTING))
-                                    {
-                                        ally.GetComponent<Fighter>().NoEnemy();                                        
-                                    }
-
-                                    ally.GetComponent<AllyBehaviour>().MoveToCover(hit.transform.gameObject);
-                                }
-                            }
-
-                            else
-                            {
-                                if ((selectedAlly.GetComponent<AllyBehaviour>().state == AllyState.SHOOTING) || (selectedAlly.GetComponent<AllyBehaviour>().state == AllyState.COVERSHOOTING))
-                                {
-                                    selectedAlly.GetComponent<Fighter>().NoEnemy();
-                                }
-
-                                selectedAlly.GetComponent<AllyBehaviour>().MoveToCover(hit.transform.gameObject);
-                            }
-                        }
-
-                        else
-                        {
-                            if (allSelected)
-                            {
-                                foreach (GameObject ally in allies)
-                                {
-                                    if (!ally.GetComponent<AllyBehaviour>().movingToCover)
-                                    {
-                                        if ((ally.GetComponent<AllyBehaviour>().state == AllyState.SHOOTING) || (ally.GetComponent<AllyBehaviour>().state == AllyState.COVERSHOOTING))
-                                        {
-                                            ally.GetComponent<Fighter>().NoEnemy();
-                                        }
-
-                                        ally.GetComponent<AllyBehaviour>().state = AllyState.MOVING;
-
-                                        ally.GetComponent<AllyBehaviour>().newPosition(pointer.transform.position);
-                                    }
-                                }
-                            }
-
-                            else
-                            {
-                                if (!selectedAlly.GetComponent<AllyBehaviour>().movingToCover)
-                                {
-                                    if ((selectedAlly.GetComponent<AllyBehaviour>().state == AllyState.SHOOTING) || (selectedAlly.GetComponent<AllyBehaviour>().state == AllyState.COVERSHOOTING))
-                                    {
-                                        selectedAlly.GetComponent<Fighter>().NoEnemy();
-                                    }
-
-                                    selectedAlly.GetComponent<AllyBehaviour>().state = AllyState.MOVING;
-
-                                    selectedAlly.GetComponent<AllyBehaviour>().newPosition(pointer.transform.position);
-                                }
-                            }
-                        }
-                    }                    
-                }
-            }
-
         }
-
-
-        private void PlayLandingSound()
-        {
-            m_AudioSource.clip = m_LandSound;
-            //m_AudioSource.Play();
-            m_NextStep = m_StepCycle + .5f;
-        }
-
-        private void AlliesSelected()
-        {
-            foreach (GameObject ally in allies)
-            {
-                ally.GetComponentInChildren<Light>().enabled = true;              
-            }
-        }
-
-        private void AlliesDeselected()
-        {
-            allSelected = false;
-
-            foreach (GameObject ally in allies)
-            {
-                ally.GetComponentInChildren<Light>().enabled = false;
-            }
-        }
-
 
         private void FixedUpdate()
         {

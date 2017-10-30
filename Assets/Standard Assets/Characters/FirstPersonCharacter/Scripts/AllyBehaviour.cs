@@ -30,12 +30,12 @@ public class AllyBehaviour : MonoBehaviour {
 
     public AllyState state;
 
-    public ParticleSystem gunLight;
+    [SerializeField] ParticleSystem gunLight;
 
-    public ParticleSystem deathExplosion;
+    [SerializeField] ParticleSystem deathExplosion;
 
     private GameObject player;
-    List<GameObject> allies = new List<GameObject>();
+    public List<GameObject> allies = new List<GameObject>();
 
     // Use this for initialization
     void Start ()
@@ -44,8 +44,12 @@ public class AllyBehaviour : MonoBehaviour {
 
         anim = GetComponent<Animator>();
 
+        player = GameObject.FindGameObjectWithTag("Player");
+
         if (tag == "Ally")
         {
+            accuracy /= 2.5f;
+
             foreach (GameObject ally in GameObject.FindGameObjectsWithTag("Ally"))
             {
                 if (ally != this)
@@ -63,19 +67,17 @@ public class AllyBehaviour : MonoBehaviour {
                 {
                     allies.Add(ally);
                 }
-            }
+            }            
         }
 
         allyAI = GetComponent<UnityEngine.AI.NavMeshAgent> ();
 
         stopMoving();
 
-        player = GameObject.FindGameObjectWithTag("Player");
-
-        if (tag == "Ally")
+        if (tag == "Enemy")
         {
-            accuracy /= 2.5f;
-        }
+            state = AllyState.FOLLOWING;
+        }               
     }
 	
 	// Update is called once per frame
@@ -100,7 +102,6 @@ public class AllyBehaviour : MonoBehaviour {
                     pos.y = transform.position.y;
 
                     newPosition(runTo);
-                    //transform.position = Vector3.MoveTowards(transform.position, ally.transform.position, -1 * speed * Time.deltaTime);
                 }
             }
         }
@@ -130,6 +131,11 @@ public class AllyBehaviour : MonoBehaviour {
         anim.SetFloat("Speed", movementSpeed);
     }
 
+    public void NewAlly(GameObject newAl)
+    {
+        allies.Add(newAl);
+    }
+
 	public void newPosition(Vector3 newPos)
 	{
 		targetTransform = newPos;
@@ -150,9 +156,7 @@ public class AllyBehaviour : MonoBehaviour {
             state = AllyState.STOPPED;
         }
 
-        targetTransform = transform.position;
-
-        allyAI.ResetPath();
+        newPosition(this.gameObject.transform.position);
     }
 
     public void FindCover()
