@@ -7,6 +7,7 @@ public class pointerMovement : MonoBehaviour {
     private bool dir = false;
     private float speed = 0.3f;
     private Vector3 targetPos;
+    private int numObjects = 0;
 
 	// Use this for initialization
 	void Start ()
@@ -45,5 +46,34 @@ public class pointerMovement : MonoBehaviour {
         targetPos.y = transform.position.y;
 
         transform.position = targetPos;
+    }
+
+    void OnTriggerEnter(Collider c)
+    {
+        if ((c.tag == "Ally") || (c.tag == "Enemy") || (c.tag == "Cover") || (c.tag == "Environment"))
+        {
+            numObjects++;
+        }
+    }
+
+    void OnTriggerExit(Collider c)
+    {
+        if ((c.tag == "Ally") || (c.tag == "Enemy") || (c.tag == "Cover") || (c.tag == "Environment"))
+        {
+            numObjects--;
+        }
+    }
+
+    public bool GetEmptySpace()
+    {
+        if (numObjects > 0)
+        {
+            return false;
+        }
+
+        else
+        {
+            return true;
+        }
     }
 }

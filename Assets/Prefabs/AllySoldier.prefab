@@ -1123,10 +1123,13 @@ MonoBehaviour:
   movingToCover: 0
   bullet: {fileID: 1986161329673824, guid: cc024e711e5f938498d9a4d731f6b9c5, type: 2}
   health: 50
+  coverPrefab: {fileID: 1043317180996198, guid: b761fb2f2b1830e4faca4b9b9e6d508f,
+    type: 2}
   state: 2
   gunLight: {fileID: 198460777259355766}
   deathExplosion: {fileID: 198982110590717260, guid: 65eac4b9277ab3b4ea33bfbbafd07379,
     type: 2}
+  allies: []
 --- !u!114 &114962590815382596
 MonoBehaviour:
   m_ObjectHideFlags: 1

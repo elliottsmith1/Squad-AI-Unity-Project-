@@ -59,6 +59,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private bool m_Jumping;
         private AudioSource m_AudioSource;
         private float selectionTimer = 0.0f;
+        private float selectionTimerLeft = 0.0f;
 
         // Use this for initialization
         private void Start()
@@ -149,7 +150,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 selectionTimer += Time.deltaTime;
 
                 if (selectionTimer > 1)
-                {
+                {                    
                     selectedAlly = null;
                     allSelected = true;
 
@@ -177,6 +178,31 @@ namespace UnityStandardAssets.Characters.FirstPerson
                         selectedAlly.GetComponentInChildren<Light>().enabled = true;
                     }
                 }
+            }
+
+            if (Input.GetMouseButton(0))
+            {
+                selectionTimerLeft += Time.deltaTime;
+
+                if (selectionTimerLeft > 1)
+                {
+                    if (selectedAlly)
+                    {
+                        if (pointer.GetComponent<pointerMovement>().GetEmptySpace())
+                        {
+                            selectedAlly.GetComponent<AllyBehaviour>().newPosition(pointer.transform.position);
+
+                            selectedAlly.GetComponent<AllyBehaviour>().state = AllyState.BUILDING;
+
+                            selectionTimerLeft = -1000;
+                        }
+                    }
+                }
+            }
+
+            if (Input.GetMouseButtonUp(0))
+            {
+                selectionTimerLeft = 0.0f;
             }
 
             if (Input.GetMouseButtonDown(0))

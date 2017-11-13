@@ -9,7 +9,8 @@ public enum AllyState
     STOPPED,
     MOVING,
     SHOOTING,
-    COVERSHOOTING
+    COVERSHOOTING,
+    BUILDING
 }
 
 public class AllyBehaviour : MonoBehaviour {
@@ -25,6 +26,8 @@ public class AllyBehaviour : MonoBehaviour {
     public GameObject bullet;
     public int health = 50;
     private float accuracy = 5;
+    [SerializeField]GameObject coverPrefab;
+    private Vector3 TargetPos;
 
     private Animator anim;
 
@@ -45,6 +48,8 @@ public class AllyBehaviour : MonoBehaviour {
         anim = GetComponent<Animator>();
 
         player = GameObject.FindGameObjectWithTag("Player");
+
+        TargetPos = GameObject.FindGameObjectWithTag("Target").transform.position;
 
         if (tag == "Ally")
         {
@@ -76,7 +81,7 @@ public class AllyBehaviour : MonoBehaviour {
 
         if (tag == "Enemy")
         {
-            state = AllyState.FOLLOWING;
+            newPosition(TargetPos);
         }               
     }
 	
@@ -122,9 +127,12 @@ public class AllyBehaviour : MonoBehaviour {
             newPosition(player.transform.position);
         }
 
-        if ((state == AllyState.MOVING) && (movementSpeed == 0) && (allyAI.remainingDistance < 1))
+        if ((state == AllyState.MOVING) || (state == AllyState.BUILDING))
         {
-            stopMoving();
+            if ((movementSpeed == 0) && (allyAI.remainingDistance < 5))
+            {
+                stopMoving();
+            }
         }
 
         if (health <= 0)
@@ -155,6 +163,18 @@ public class AllyBehaviour : MonoBehaviour {
 
     public void stopMoving()
     {
+        if (tag == "Enemy")
+        {
+            newPosition(TargetPos);
+            return;
+        }
+
+        if (state == AllyState.BUILDING)
+        {            
+            NewCover();
+            return;
+        }
+
         if (movingToCover)
         {
             allyAI.stoppingDistance = 3;
@@ -333,5 +353,19 @@ public class AllyBehaviour : MonoBehaviour {
     public void NewHealth(int hlth)
     {
         health += hlth;
+    }
+
+    public void NewCover()
+    {
+        Vector3 relativePos = allyAI.destination - TargetPos;
+        Quaternion rot = Quaternion.LookRotation(relativePos);
+
+        GameObject obj = Instantiate(coverPrefab, allyAI.destination, Quaternion.identity);
+
+        obj.transform.rotation = rot;
+
+        state = AllyState.STOPPED;
+
+        newPosition(this.gameObject.transform.position);        
     }
 }

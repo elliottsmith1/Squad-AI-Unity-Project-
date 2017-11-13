@@ -18,19 +18,6 @@ public class FighterDetection : MonoBehaviour {
 		
 	}
 
-    //void OnTriggerEnter(Collider c)
-    //{
-    //    if ((parentGameobject.tag == "Enemy") && (c.tag == "Ally"))
-    //    {
-    //        parentGameobject.GetComponent<Fighter>().newEnemy(c.transform.gameObject);
-    //    }
-
-    //    else if ((parentGameobject.tag == "Ally") && (c.tag == "Enemy"))
-    //    {
-    //        parentGameobject.GetComponent<Fighter>().newEnemy(c.transform.gameObject);
-    //    }
-    //}
-
     void OnTriggerExit(Collider c)
     {
         if ((parentGameobject.tag == "Enemy") && (c.tag == "Ally"))
@@ -52,7 +39,7 @@ public class FighterDetection : MonoBehaviour {
         {
             if (!parentGameobject.GetComponent<Fighter>().GetMovingToCover())
             {
-                if ((parentGameobject.tag == "Enemy") && (c.tag == "Ally"))
+                if ((parentGameobject.tag == "Enemy") && ((c.tag == "Ally") || (c.tag == "Target")))
                 {
                     parentGameobject.GetComponent<Fighter>().newEnemy(c.transform.gameObject);
                 }
