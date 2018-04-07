@@ -5,6 +5,7 @@ using UnityStandardAssets.Utility;
 using Random = UnityEngine.Random;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 namespace UnityStandardAssets.Characters.FirstPerson
 {
@@ -44,8 +45,18 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private bool allSelected = false;
 
+		private bool canSpawn = false;
+
+		private int maxAllies = 6;
+
+		[SerializeField] Text spawnTextRef;
+		[SerializeField] Text coverTextRef;
+
+		private Score score_ref;
+
         private GameObject pointer;
 
+		//movement controls 
         private bool m_Jump;
         private float m_YRotation;
         private Vector2 m_Input;
@@ -81,6 +92,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
 
             pointer = GameObject.FindGameObjectWithTag("Pointer");
+
+			score_ref = GetComponent<Score> ();
         }
 
 
@@ -154,6 +167,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     selectedAlly = null;
                     allSelected = true;
 
+					coverTextRef.enabled = false;
+
                     AlliesSelected();
                 }
             }
@@ -167,13 +182,15 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 RaycastHit hit;
 
-                if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hit))
+				if (Physics.SphereCast(transform.position, 2, transform.forward, out hit))
                 {
                     if (hit.transform.tag == "Ally")
                     {
                         AlliesDeselected();
 
                         selectedAlly = hit.transform.gameObject;
+
+						coverTextRef.enabled = true;
 
                         selectedAlly.GetComponentInChildren<Light>().enabled = true;
                     }
@@ -188,13 +205,18 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 {
                     if (selectedAlly)
                     {
-                        if (pointer.GetComponent<pointerMovement>().GetEmptySpace())
-                        {
-                            selectedAlly.GetComponent<AllyBehaviour>().newPosition(pointer.transform.position);
+						if (score_ref.GetScore() >= 250)
+						{
+							if (pointer.GetComponent<pointerMovement> ().GetEmptySpace ()) 
+							{
+								score_ref.UpdateScore (-250);
 
-                            selectedAlly.GetComponent<AllyBehaviour>().state = AllyState.BUILDING;
+								selectedAlly.GetComponent<AllyBehaviour> ().newPosition (pointer.transform.position);
 
-                            selectionTimerLeft = -1000;
+								selectedAlly.GetComponent<AllyBehaviour> ().state = AllyState.BUILDING;
+
+								selectionTimerLeft = -1000;
+							}
                         }
                     }
                 }
@@ -218,10 +240,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     {
                         foreach (GameObject ally in allies)
                         {
-                            if ((ally.GetComponent<AllyBehaviour>().state == AllyState.SHOOTING) || (ally.GetComponent<AllyBehaviour>().state == AllyState.COVERSHOOTING))
-                            {
-                                ally.GetComponent<Fighter>().NoEnemy();
-                            }
+                            ally.GetComponent<Fighter>().NoEnemy();
 
                             ally.GetComponent<AllyBehaviour>().MoveToCover(selectedCover);
                         }
@@ -229,10 +248,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
                     else if (selectedAlly)
                     {
-                        if ((selectedAlly.GetComponent<AllyBehaviour>().state == AllyState.SHOOTING) || (selectedAlly.GetComponent<AllyBehaviour>().state == AllyState.COVERSHOOTING))
-                        {
-                            selectedAlly.GetComponent<Fighter>().NoEnemy();
-                        }
+                        selectedAlly.GetComponent<Fighter>().NoEnemy();
 
                         selectedAlly.GetComponent<AllyBehaviour>().MoveToCover(selectedCover);
                     }
@@ -246,30 +262,30 @@ namespace UnityStandardAssets.Characters.FirstPerson
                         {
                             if (!ally.GetComponent<AllyBehaviour>().movingToCover)
                             {
-                                if ((ally.GetComponent<AllyBehaviour>().state == AllyState.SHOOTING) || (ally.GetComponent<AllyBehaviour>().state == AllyState.COVERSHOOTING))
-                                {
-                                    ally.GetComponent<Fighter>().NoEnemy();
-                                }
+								if (ally.GetComponent<AllyBehaviour> ().state != AllyState.BUILDING) 
+								{
+									ally.GetComponent<Fighter> ().NoEnemy ();
 
-                                ally.GetComponent<AllyBehaviour>().state = AllyState.MOVING;
+									ally.GetComponent<AllyBehaviour> ().state = AllyState.MOVING;
 
-                                ally.GetComponent<AllyBehaviour>().newPosition(pointer.transform.position);
+									ally.GetComponent<AllyBehaviour> ().newPosition (pointer.transform.position);
+								}
                             }
                         }
                     }
 
                     else if (selectedAlly)
                     {
-                        if (!selectedAlly.GetComponent<AllyBehaviour>().movingToCover)
+                        if (!selectedAlly.GetComponent<AllyBehaviour>().movingToCover) 
                         {
-                            if ((selectedAlly.GetComponent<AllyBehaviour>().state == AllyState.SHOOTING) || (selectedAlly.GetComponent<AllyBehaviour>().state == AllyState.COVERSHOOTING))
-                            {
-                                selectedAlly.GetComponent<Fighter>().NoEnemy();
-                            }
+							if (selectedAlly.GetComponent<AllyBehaviour> ().state != AllyState.BUILDING) 
+							{
+								selectedAlly.GetComponent<Fighter> ().NoEnemy ();
 
-                            selectedAlly.GetComponent<AllyBehaviour>().state = AllyState.MOVING;
+								selectedAlly.GetComponent<AllyBehaviour> ().state = AllyState.MOVING;
 
-                            selectedAlly.GetComponent<AllyBehaviour>().newPosition(pointer.transform.position);
+								selectedAlly.GetComponent<AllyBehaviour> ().newPosition (pointer.transform.position);
+							}
                         }
                     }
                 }
@@ -278,17 +294,37 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void CheckKeys()
         {
-            if (CrossPlatformInputManager.GetButtonDown("Point"))
-            {
-                GameObject obj = Instantiate(allyPrefab, pointer.transform.position, Quaternion.identity);
+			if (canSpawn) 
+			{
+				if (allies.Count < maxAllies) 
+				{
+					if (CrossPlatformInputManager.GetButtonDown ("Point")) 
+					{					
+						if (score_ref.GetScore () >= 100) 
+						{
+							score_ref.UpdateScore (-100);
 
-                foreach (GameObject ally in allies)
-                {
-                    ally.GetComponent<AllyBehaviour>().NewAlly(obj);
-                }
+							Vector3 spawnPos = transform.position;
 
-                allies.Add(obj);                
-            }
+							spawnPos.x += Random.Range (-10, 10);
+							spawnPos.z += Random.Range (-10, 10);
+
+							GameObject obj = Instantiate (allyPrefab, spawnPos, Quaternion.identity);
+
+							foreach (GameObject ally in allies) {
+								ally.GetComponent<AllyBehaviour> ().NewAlly (obj);
+							}
+
+							allies.Add (obj);    
+						}
+					}
+				} 
+
+				else 
+				{
+					spawnTextRef.enabled = false;
+				}
+			}
 
             if (Input.GetButtonDown("Follow"))
             {
@@ -325,26 +361,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             RaycastHit hit2;
 
-            if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hit2))
+			if (Physics.SphereCast(transform.position, 2, transform.forward, out hit2))
             {
-                if (selectedCover)
-                {
-                    if (hit2.transform.gameObject != selectedCover)
-                    {
-                        selectedCover.transform.Find("CoverCircle").gameObject.GetComponent<Renderer>().enabled = false;
-                        selectedCover = null;
-                    }
-                }
-
-                if (allyLookedAt)
-                {
-                    if (hit2.transform.gameObject != allyLookedAt)
-                    {
-                        allyLookedAt.transform.Find("AllyCircle").gameObject.GetComponent<Renderer>().enabled = false;
-                        allyLookedAt = null;
-                    }
-                }
-
                 if (hit2.transform.tag == "Cover")
                 {
                     if ((hit2.transform.gameObject != selectedCover) || (selectedCover == null))
@@ -538,5 +556,23 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
             body.AddForceAtPosition(m_CharacterController.velocity*0.1f, hit.point, ForceMode.Impulse);
         }
+
+		public void SetCanSpawn(bool _spawn)
+		{
+			canSpawn = _spawn;
+
+			if (canSpawn) 
+			{
+				if (allies.Count < maxAllies) 
+				{
+					spawnTextRef.enabled = true;
+				}
+			} 
+
+			else 
+			{
+				spawnTextRef.enabled = false;
+			}
+		}
     }
 }

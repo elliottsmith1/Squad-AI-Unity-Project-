@@ -19,7 +19,7 @@ public class AllyBehaviour : MonoBehaviour {
 	public float speed = 3.0f;
 	private UnityEngine.AI.NavMeshAgent allyAI;
     public float minRange = 0.1f;
-    private float allyDistance = 5.0f;
+    private float allyDistance = 3.0f;
     public bool movingToCover = false;
     private float movementSpeed = 0.0f;
     private Vector3 lastPosition = Vector3.zero;
@@ -92,51 +92,54 @@ public class AllyBehaviour : MonoBehaviour {
 
         float move = GetComponent<Rigidbody>().velocity.magnitude;
 
-        if ((state == AllyState.STOPPED) || (state == AllyState.SHOOTING))
-        {
-            foreach (GameObject ally in allies)
-            {
-                if (Vector3.Distance(transform.position, ally.transform.position) < allyDistance)
-                {
-                    Vector3 pos = transform.position - ally.transform.position;
+		if (!movingToCover) 
+		{
+			if ((state == AllyState.STOPPED) || (state == AllyState.SHOOTING) || (state == AllyState.MOVING)) 
+			{
+				foreach (GameObject ally in allies)
+				{
+					if (Vector3.Distance (transform.position, ally.transform.position) < allyDistance) 
+					{
+						Vector3 pos = transform.position - ally.transform.position;
 
-                    Vector3 runTo = transform.position + ((transform.position - ally.transform.position) * 1);
+						Vector3 runTo = transform.position + ((transform.position - ally.transform.position) * 1);
 
-                    pos *= -5;
+						pos *= -2;
 
-                    pos.y = transform.position.y;
+						pos.y = transform.position.y;
 
-                    newPosition(runTo);
-                }
-            }
-        }
-
-        if (state == AllyState.MOVING)
-        {
-            foreach (GameObject ally in allies)
-            {
-                if (Vector3.Distance(transform.position, ally.transform.position) < 2)
-                {
-                    transform.position = Vector3.MoveTowards(transform.position, ally.transform.position, -1 * speed * Time.deltaTime);
-                }
-            }
-        }
+						newPosition (runTo);
+					}
+				}
+			}	
+		}
 
         if (state == AllyState.FOLLOWING)
         {
             newPosition(player.transform.position);
         }
 
-        if ((state == AllyState.MOVING) || (state == AllyState.BUILDING))
+		if ((state == AllyState.BUILDING) || (state == AllyState.MOVING))
         {
-            if ((movementSpeed == 0) && (allyAI.remainingDistance < 5))
-            {
-                stopMoving();
-            }
+			if (!allyAI.pathPending) 
+			{
+				if (allyAI.remainingDistance <= allyAI.stoppingDistance) 
+				{
+					if ((!allyAI.hasPath) || (allyAI.velocity.sqrMagnitude == 0.0f)) 
+					{
+						stopMoving ();
+					}
+				}
+			}
         }
 
         if (health <= 0)
         {
+			if (tag == "Enemy") 
+			{
+				player.GetComponent<Score> ().UpdateScore (50);
+			}
+
             Instantiate(deathExplosion, transform.position, transform.rotation);
             Destroy(this.gameObject);
         }
@@ -165,8 +168,11 @@ public class AllyBehaviour : MonoBehaviour {
     {
         if (tag == "Enemy")
         {
-            newPosition(TargetPos);
-            return;
+			if (Vector3.Distance (transform.position, TargetPos) < 10) 
+			{
+				newPosition (TargetPos);
+				return;
+			}
         }
 
         if (state == AllyState.BUILDING)
@@ -229,20 +235,9 @@ public class AllyBehaviour : MonoBehaviour {
 
         if (closest != null)
         {
-            foreach (Transform child in closest.transform)
-            {
-                if (child.tag == "CoverPoint")
-                {
-                    if (child.GetComponent<CoverPoint>().Occupied == false)
-                    {
-                        child.GetComponent<CoverPoint>().Occupied = true;
-                        newPosition(child.transform.position);
-                        movingToCover = true;
-                        allyAI.stoppingDistance = 0.1f;
-                        return;
-                    }
-                }
-            }
+			movingToCover = true;
+
+			MoveToCover (closest);
         }
     }
 
@@ -278,10 +273,10 @@ public class AllyBehaviour : MonoBehaviour {
                 {
                     if (child.GetComponent<CoverPoint>().Occupied == false)
                     {
+						allyAI.stoppingDistance = 0.1f;
                         child.GetComponent<CoverPoint>().Occupied = true;
                         newPosition(child.transform.position);
                         movingToCover = true;
-                        allyAI.stoppingDistance = 0.1f;
                         return;
                     }
                 }
@@ -291,8 +286,6 @@ public class AllyBehaviour : MonoBehaviour {
 
     public void NewEnemy()
     {
-        //stopMoving();        
-
         if (!movingToCover)
         {
             if (state == AllyState.COVER)
@@ -359,6 +352,9 @@ public class AllyBehaviour : MonoBehaviour {
     {
         Vector3 relativePos = allyAI.destination - TargetPos;
         Quaternion rot = Quaternion.LookRotation(relativePos);
+
+		rot.z = 0;
+		rot.x = 0;
 
         GameObject obj = Instantiate(coverPrefab, allyAI.destination, Quaternion.identity);
 

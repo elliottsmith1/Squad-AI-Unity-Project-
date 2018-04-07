@@ -4,18 +4,17 @@ using UnityEngine;
 
 public class BulletDetection : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
     void OnTriggerEnter(Collider c)
     {
+		if ((tag == "EnemyBullet") && (c.gameObject.tag == "Target"))
+		{
+			if (Vector3.Distance (c.gameObject.transform.position, transform.position) < 3.0f) 
+			{
+				c.gameObject.GetComponent<Target> ().DamageTarget (1);
+				Destroy (this.gameObject);
+			}
+		}
+
         if (((c.tag == "Enemy") && (tag == "Bullet")) || ((c.tag == "Ally") && (tag == "EnemyBullet")))
         {
             if ((c.GetComponent<AllyBehaviour>().state == AllyState.COVER) || (c.GetComponent<AllyBehaviour>().state == AllyState.COVERSHOOTING))

@@ -20,18 +20,7 @@ public class CoverPoint : MonoBehaviour {
     {
         if (c.tag == "Ally")
         {
-            Occupied = false; 
-        }
-    }
-
-    void OnTriggerStay(Collider c)
-    {
-        if (c.tag == "Ally")
-        {
-            if (!Occupied)
-            {
-                Occupied = true;
-            }
+            Occupied = false;
         }
     }
 }
