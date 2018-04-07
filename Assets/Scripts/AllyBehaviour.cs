@@ -5,7 +5,6 @@ using UnityEngine;
 public enum AllyState
 {
     COVER,
-    FOLLOWING,
     STOPPED,
     MOVING,
     SHOOTING,
@@ -21,6 +20,7 @@ public class AllyBehaviour : MonoBehaviour {
     public float minRange = 0.1f;
     private float allyDistance = 3.0f;
     public bool movingToCover = false;
+	public bool following = false;
     private float movementSpeed = 0.0f;
     private Vector3 lastPosition = Vector3.zero;
     public GameObject bullet;
@@ -104,7 +104,7 @@ public class AllyBehaviour : MonoBehaviour {
 
 						Vector3 runTo = transform.position + ((transform.position - ally.transform.position) * 1);
 
-						pos *= -2;
+						pos *= -1;
 
 						pos.y = transform.position.y;
 
@@ -114,10 +114,17 @@ public class AllyBehaviour : MonoBehaviour {
 			}	
 		}
 
-        if (state == AllyState.FOLLOWING)
-        {
-            newPosition(player.transform.position);
-        }
+		if (state == AllyState.STOPPED) 
+		{
+			if (following) 
+			{
+				if (Vector3.Distance (transform.position, player.transform.position) < 10) 
+				{
+					Vector3 newPos = Vector3.Lerp (transform.position, player.transform.position, 0.2f);
+					newPosition (newPos);
+				}
+			}
+		}
 
 		if ((state == AllyState.BUILDING) || (state == AllyState.MOVING))
         {

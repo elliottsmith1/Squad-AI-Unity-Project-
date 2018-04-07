@@ -45,6 +45,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private bool allSelected = false;
 
+		private bool followMode = false;
+
 		private bool canSpawn = false;
 
 		private int maxAllies = 6;
@@ -328,33 +330,23 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             if (Input.GetButtonDown("Follow"))
             {
-                foreach (GameObject ally in allies)
-                {
-                    if (ally.GetComponent<AllyBehaviour>().state != AllyState.FOLLOWING)
-                    {
-                        if (ally.GetComponent<AllyBehaviour>().movingToCover != true)
-                        {
-                            ally.GetComponent<AllyBehaviour>().state = AllyState.FOLLOWING;
-                        }
-                    }
+				if (followMode) 
+				{
+					foreach (GameObject ally in allies) 
+					{
+						ally.GetComponent<AllyBehaviour> ().following = false;
+					}
+				} 
 
-                    else
-                    {
-                        ally.GetComponent<AllyBehaviour>().stopMoving();
-                    }
-                }
+				else 
+				{
+					foreach (GameObject ally in allies) 
+					{
+						ally.GetComponent<AllyBehaviour> ().following = false;
+					}
+				}
             }
 
-            if (Input.GetButtonDown("Cover"))
-            {
-                foreach (GameObject ally in allies)
-                {
-                    if (ally.GetComponent<AllyBehaviour>().state != AllyState.COVER)
-                    {
-                        ally.GetComponent<AllyBehaviour>().FindCover();
-                    }
-                }
-            }
         }
 
         private void LookingAt()
